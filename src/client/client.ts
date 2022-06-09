@@ -36,8 +36,8 @@ const light2 = new THREE.PointLight(0xea7777, 1, 100);
 light2.position.set(0.0, 0.0, 4.0); 
 scene.add(light2);
 
-const cube = new THREE.Mesh(geometry, material)
-scene.add(cube)
+const sphere = new THREE.Mesh(geometry, material)
+scene.add(sphere)
 
 
 // add helpers to make visualizing things a little easier
@@ -67,9 +67,9 @@ function animate() {
     requestAnimationFrame(animate)
     // play around with sin wave
     let wave = Math.sin(clock.getElapsedTime());
-    cube.rotation.x += 0.01
-    cube.rotation.y += 0.01
-    cube.scale.set(wave, wave, wave);
+    sphere.rotation.x += 0.01
+    sphere.rotation.y += 0.01
+    sphere.scale.set(wave, wave, wave);
     render()
 }
 
