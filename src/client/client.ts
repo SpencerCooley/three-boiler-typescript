@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-
+import * as TWEEN from '@tweenjs/tween.js'
 // create a class for a button 
 // pass the button an object that determines all of it's properties
 // pass the button a position {x,y,z}
@@ -72,12 +72,34 @@ const screen = new THREE.Mesh(geometry1, videoMaterial)
 scene.add(screen)
 scene.add(button)
 scene.add(buttonBack)
-// button.rotation.x = -.1;
+button.rotation.x = -.13;
 
+const tween1 = new TWEEN.Tween({x:0, y:0, z: 20})
+.to({x:0, y:0, z: 0}, 500);
+tween1.onUpdate((object, elapsed) => {
+    screen.position.set(object.x, object.y, object.z);
+});
+tween1.start();
+
+
+const tween2 = new TWEEN.Tween({x:0, y:0, z: -20})
+.to({x:0, y:0, z: 0}, 1000);
+tween2.onUpdate((object, elapsed) => {
+    button.position.set(object.x, object.y, object.z);
+});
+tween2.start();
+
+
+const tween3 = new TWEEN.Tween({x:0, y:0, z: -20})
+.to({x:0, y:0, z: 0}, 800);
+tween3.onUpdate((object, elapsed) => {
+    buttonBack.position.set(object.x, object.y, object.z);
+});
+tween3.start();
 
 //lights
 const light = new THREE.PointLight(0xffffff, 1, 100);
-light.position.set(9, 9, -10.0); 
+light.position.set(0, -1, -1.0); 
 scene.add(light);
 
 const light2 = new THREE.PointLight(0xea7777, 1, 100);
@@ -130,10 +152,29 @@ const pointer = new THREE.Vector2();
 
 window.addEventListener( 'mousedown', onPointerClick );
 window.addEventListener( 'mouseup', onMouseUp );
+window.addEventListener( 'mousemove', onMouseMove);
+
+function onMouseMove( event ) {
+    raycaster.setFromCamera(
+        {
+            x: (event.clientX / renderer.domElement.clientWidth) * 2 - 1,
+            y: -(event.clientY / renderer.domElement.clientHeight) * 2 + 1
+        },
+        camera
+    )
+    let intersects = raycaster.intersectObject(button, false);
+    if(intersects.length) {
+        document.body.style.cursor = 'pointer';
+        button.scale.set(.94, .94, .94);
+        // handle log in details here. 
+    } else {
+        document.body.style.cursor = 'default';
+        button.scale.set(1, 1, 1);
+    }
+}
 
 function onMouseUp( event ) {
     button.scale.set(1, 1, 1);
-    document.body.style.cursor = 'default';
 }
 
 function onPointerClick( event ) {
@@ -146,6 +187,7 @@ function onPointerClick( event ) {
     )
     let intersects = raycaster.intersectObject(button, false);
     if(intersects.length) {
+        alert('log in the user.');
         document.body.style.cursor = 'pointer';
         button.scale.set(.9, .9, .9);
         // handle log in details here. 
@@ -166,7 +208,8 @@ function animate() {
 }
 
 function render() {
-    renderer.render(scene, camera)
+    renderer.render(scene, camera);
+    TWEEN.update();
     videoTexture.needsUpdate = true;
     video.play();
 }
