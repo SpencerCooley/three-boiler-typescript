@@ -26,7 +26,7 @@ const camera = new THREE.PerspectiveCamera(
     0.1,
     1000
 )
-camera.position.z = -2.0
+camera.position.z = -6.0
 camera.position.x = 0
 camera.position.y = 0
 
@@ -39,24 +39,49 @@ new OrbitControls(camera, renderer.domElement)
 
 
 
-const geometry = new THREE.SphereGeometry( 1, 20, 20 )
+const geometry = new THREE.BoxGeometry( 2, 1, 1 );
+const geometry2 = new THREE.BoxGeometry( 3, 2, .1 );
+const geometry1 = new THREE.PlaneGeometry( 16, 9 );
+
+const video = document.getElementById( 'videoElement' ) as HTMLVideoElement;
+video.setAttribute("crossorigin", "anonymous");
+video.play()
+const videoTexture = new THREE.VideoTexture( video );
+
+const videoMaterial = new THREE.MeshBasicMaterial({
+    map: videoTexture,
+    side: THREE.DoubleSide,
+    toneMapped: false,
+})
 const material = new THREE.MeshPhongMaterial({
     color: 0xffffff,
     wireframe: false,
     side: THREE.DoubleSide,
 });
 
-const sphere = new THREE.Mesh(geometry, material)
-scene.add(sphere)
+const material2 = new THREE.MeshPhongMaterial({
+    color: 0x666666,
+    wireframe: false,
+    side: THREE.DoubleSide,
+});
+
+
+const button = new THREE.Mesh(geometry, material);
+const buttonBack = new THREE.Mesh(geometry2, material2);
+const screen = new THREE.Mesh(geometry1, videoMaterial)
+scene.add(screen)
+scene.add(button)
+scene.add(buttonBack)
+// button.rotation.x = -.1;
 
 
 //lights
 const light = new THREE.PointLight(0xffffff, 1, 100);
-light.position.set(0.0, 0.0, -4.0); 
+light.position.set(9, 9, -10.0); 
 scene.add(light);
 
 const light2 = new THREE.PointLight(0xea7777, 1, 100);
-light2.position.set(0.0, 0.0, 4.0); 
+light2.position.set(0.0, 0.0, 10.0); 
 scene.add(light2);
 
 //lights
@@ -68,16 +93,19 @@ scene.add(light2);
 // add helpers to make visualizing things a little easier
 // add helpers to make visualizing things a little easier
 // add helpers to make visualizing things a little easier
-const sphereSize = 1;
-const pointLightHelper = new THREE.PointLightHelper( light, sphereSize );
-scene.add( pointLightHelper );
+const helpers = false;
+if(helpers) {
+    const sphereSize = 1;
+    const pointLightHelper = new THREE.PointLightHelper( light, sphereSize );
+    scene.add( pointLightHelper );
 
 
-const pointLightHelper2 = new THREE.PointLightHelper( light2, sphereSize );
-scene.add( pointLightHelper2 );
+    const pointLightHelper2 = new THREE.PointLightHelper( light2, sphereSize );
+    scene.add( pointLightHelper2 );
 
-const axesHelper = new THREE.AxesHelper( 5 );
-scene.add( axesHelper );
+    const axesHelper = new THREE.AxesHelper( 5 );
+    scene.add( axesHelper );
+}
 
 // end helpers to make visualizing things a little easier
 // end helpers to make visualizing things a little easier
@@ -85,6 +113,7 @@ scene.add( axesHelper );
 
 
 const clock = new THREE.Clock();
+
 
 
 window.addEventListener('resize', onWindowResize, false)
@@ -103,7 +132,7 @@ window.addEventListener( 'mousedown', onPointerClick );
 window.addEventListener( 'mouseup', onMouseUp );
 
 function onMouseUp( event ) {
-    sphere.scale.set(1, 1, 1);
+    button.scale.set(1, 1, 1);
     document.body.style.cursor = 'default';
 }
 
@@ -115,26 +144,31 @@ function onPointerClick( event ) {
         },
         camera
     )
-    let intersects = raycaster.intersectObject(sphere, false);
+    let intersects = raycaster.intersectObject(button, false);
     if(intersects.length) {
         document.body.style.cursor = 'pointer';
-        sphere.scale.set(.9, .9, .9);
+        button.scale.set(.9, .9, .9);
         // handle log in details here. 
     } 
 }
 
+
+
 function animate() {
     requestAnimationFrame(animate)
+    
     // play around with sin wave
     // let wave = Math.sin(clock.getElapsedTime());
     // sphere.rotation.x += 0.01
-    // sphere.rotation.y += 0.01
-    // sphere.scale.set(wave, wave, wave);
+    // sphere.rotation.y += 0.1
+    // sphere.scale.set(5.0, 5.0, .2);
     render()
 }
 
 function render() {
     renderer.render(scene, camera)
+    videoTexture.needsUpdate = true;
+    video.play();
 }
 
 animate()
