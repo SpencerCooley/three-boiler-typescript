@@ -208,7 +208,7 @@ const material = new THREE.MeshPhongMaterial({
 const clock = new THREE.Clock();
 
 const cameraFollowsPath = (tube, elapsedTime) => {
-    const loopTime = 20; 
+    const loopTime = 50; 
     const t = (elapsedTime % loopTime)/loopTime;
     const t2 = ((elapsedTime + 0.1) % loopTime)/loopTime;
 
