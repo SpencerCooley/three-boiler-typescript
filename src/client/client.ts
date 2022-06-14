@@ -207,16 +207,13 @@ const material = new THREE.MeshPhongMaterial({
 
 const clock = new THREE.Clock();
 
-tubeMesh1.scale.set(.1,.1,.1);
-tubeMesh1.position.set(0,4,0);
-
 const cameraFollowsPath = (tube, elapsedTime) => {
     const loopTime = 20; 
     const t = (elapsedTime % loopTime)/loopTime;
     const t2 = ((elapsedTime + 0.1) % loopTime)/loopTime;
 
     const pos = tube.geometry.parameters.path.getPointAt(t);
-    pos.y +=3;
+    pos.y +=2;
     camera.position.copy(pos);
     camera.lookAt(0,1.5,0);
 }
