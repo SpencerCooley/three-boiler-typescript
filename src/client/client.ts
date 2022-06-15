@@ -14,7 +14,8 @@ import { GrannyKnot, HeartCurve, VivianiCurve, TrefoilKnot, TorusKnot, Cinquefoi
 //hdr: 
 // https://storage.googleapis.com/img-gorillaisms/hamburg_hbf_1k.hdr
 
-
+const lowPolyStadiumModel = 'https://storage.googleapis.com/img-gorillaisms/orange.glb';
+const stadiumModel = 'https://storage.googleapis.com/img-gorillaisms/MetaBall_Stadium.glb';
 const skyBox = "https://storage.googleapis.com/img-gorillaisms/hamburg_hbf_1k.hdr";
 
 
@@ -28,9 +29,13 @@ dracoLoader.setDecoderPath( 'https://threejs.org/examples/js/libs/draco/' );
 loader.setDRACOLoader( dracoLoader );
 
 
+
+
+
+
 loader.load(
     // resource URL
-    'https://storage.googleapis.com/img-gorillaisms/orange.glb',
+    stadiumModel,
     // called when the resource is loaded
     function ( gltf ) {
         scene.add( gltf.scene );
@@ -90,49 +95,6 @@ const texture = new THREE.TextureLoader().load( skyBox );
 scene.environment = texture;
 
 
-
-const curve1 = new VivianiCurve(1);
-const curve2 = new TorusKnot(1);
-const curve3 = new CinquefoilKnot(1);
-
-const curve1Geometry = new THREE.TubeBufferGeometry(curve1, 100, .2, 9, true);
-const curve2Geometry = new THREE.TubeBufferGeometry(curve2, 100, .2, 9, true);
-const curve3Geometry = new THREE.TubeBufferGeometry(curve3, 100, .2, 9, true);
-
-const material1 = new THREE.MeshBasicMaterial({color: 0x000000, wireframe: true, side: THREE.DoubleSide});
-
-const tubeMesh1 = new THREE.Mesh(curve1Geometry, material1);
-const tubeMesh2 = new THREE.Mesh(curve2Geometry, material1);
-const tubeMesh3 = new THREE.Mesh(curve3Geometry, material1);
-
-
-// scene.add(tubeMesh1);
-// scene.add(tubeMesh2);
-// scene.add(tubeMesh3);
-
-let selectedPath = 0;
-const possiblePaths = [
-    tubeMesh1,
-    tubeMesh2,
-    tubeMesh3
-];
-
-const button1 = document.getElementById('path1');
-const button2 = document.getElementById('path2');
-const button3 = document.getElementById('path3');
-
-button1.addEventListener('click', () => {
-    selectedPath = 0;
-});
-
-button2.addEventListener('click', () => {
-    selectedPath = 1;
-});
-
-button3.addEventListener('click', () => {
-    selectedPath = 2;
-});
-
 const camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
@@ -144,9 +106,7 @@ camera.position.x = 0
 camera.position.y = 0
 
 
-
 const renderer = new THREE.WebGLRenderer()
-
 
 
 // load outside 
@@ -207,18 +167,6 @@ const material = new THREE.MeshPhongMaterial({
 
 const clock = new THREE.Clock();
 
-const cameraFollowsPath = (tube, elapsedTime) => {
-    const loopTime = 50; 
-    const t = (elapsedTime % loopTime)/loopTime;
-    const t2 = ((elapsedTime + 0.1) % loopTime)/loopTime;
-
-    const pos = tube.geometry.parameters.path.getPointAt(t);
-    pos.y +=2;
-    camera.position.copy(pos);
-    camera.lookAt(0,1.5,0);
-}
-
-
 
 window.addEventListener('resize', onWindowResize, false)
 function onWindowResize() {
@@ -237,7 +185,7 @@ function animate() {
 }
 
 function render() {
-    cameraFollowsPath(possiblePaths[selectedPath], clock.getElapsedTime())
+    // cameraFollowsPath(possiblePaths[selectedPath], clock.getElapsedTime())
     
     renderer.render(scene, camera)
 }
