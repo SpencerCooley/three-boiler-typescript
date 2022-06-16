@@ -3,7 +3,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
-import { GrannyKnot, HeartCurve, VivianiCurve, TrefoilKnot, TorusKnot, CinquefoilKnot} from 'three/examples/jsm/curves/CurveExtras';
+import Stats from 'three/examples/jsm/libs/stats.module.js'
+import { GrannyKnot, HeartCurve, VivianiCurve, TrefoilKnot, TorusKnot, CinquefoilKnot } from 'three/examples/jsm/curves/CurveExtras';
 
 // avatar: 
 // https://storage.googleapis.com/img-gorillaisms/thraxatar.glb
@@ -16,10 +17,15 @@ import { GrannyKnot, HeartCurve, VivianiCurve, TrefoilKnot, TorusKnot, Cinquefoi
 
 const lowPolyStadiumModel = 'https://storage.googleapis.com/img-gorillaisms/orange.glb';
 const stadiumModel = 'https://storage.googleapis.com/img-gorillaisms/MetaBall_Stadium.glb';
+
+const screen1 = 'https://storage.googleapis.com/img-gorillaisms/remapped-screen-large-1.glb';
+const screen2 = 'https://storage.googleapis.com/img-gorillaisms/screen-large-2.glb';
+
 const skyBox = "https://storage.googleapis.com/img-gorillaisms/hamburg_hbf_1k.hdr";
 
 
-
+const stats = Stats()
+document.body.appendChild(stats.dom)
 
 // Load a glTF resource
 
@@ -29,6 +35,84 @@ dracoLoader.setDecoderPath( 'https://threejs.org/examples/js/libs/draco/' );
 loader.setDRACOLoader( dracoLoader );
 
 
+
+const video = document.getElementById( 'videoElement' ) as HTMLVideoElement;
+video.setAttribute("crossorigin", "anonymous");
+video.play()
+const videoTexture = new THREE.VideoTexture( video );
+
+const videoMaterial = new THREE.MeshBasicMaterial({
+    map: videoTexture,
+    side: THREE.FrontSide,
+    toneMapped: false,
+})
+
+let screen1Mesh = null;
+loader.load(
+    // resource URL
+    screen1,
+    // called when the resource is loaded
+    function (gltf) {
+        scene.add(gltf.scene);
+        
+        gltf.animations; // Array<THREE.AnimationClip>
+        gltf.scene; // THREE.Group
+        gltf.scenes; // Array<THREE.Group>
+        gltf.cameras; // Array<THREE.Camera>
+        gltf.asset; // Object
+        gltf.scene.traverse(function(o) {
+            
+            screen1Mesh = o;
+            // @ts-ignore
+            o.material = videoMaterial;
+            if (o instanceof THREE.Mesh) { 
+                console.log('look here');
+                console.log(o);
+                o.material = videoMaterial;
+            } 
+        });
+    },
+    // called while loading is progressing
+    function ( xhr ) {
+
+        // console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+    },
+    // called when loading has errors
+    function ( error ) {
+        console.log(error);
+        console.log( 'An error happened' );
+
+    }
+);
+
+
+// loader.load(
+//     // resource URL
+//     screen2,
+//     // called when the resource is loaded
+//     function ( gltf ) {
+//         scene.add( gltf.scene );
+
+//         gltf.animations; // Array<THREE.AnimationClip>
+//         gltf.scene; // THREE.Group
+//         gltf.scenes; // Array<THREE.Group>
+//         gltf.cameras; // Array<THREE.Camera>
+//         gltf.asset; // Object
+//     },
+//     // called while loading is progressing
+//     function ( xhr ) {
+
+//         console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+
+//     },
+//     // called when loading has errors
+//     function ( error ) {
+//         console.log(error);
+//         console.log( 'An error happened' );
+
+//     }
+// );
 
 
 
@@ -61,32 +145,34 @@ loader.load(
 );
 
 
-loader.load(
-    // resource URL
-    'https://storage.googleapis.com/img-gorillaisms/thraxatar.glb',
-    // called when the resource is loaded
-    function ( gltf ) {
-        scene.add( gltf.scene );
-        gltf.animations; // Array<THREE.AnimationClip>
-        gltf.scene; // THREE.Group
-        gltf.scenes; // Array<THREE.Group>
-        gltf.cameras; // Array<THREE.Camera>
-        gltf.asset; // Object
+
+
+// loader.load(
+//     // resource URL
+//     'https://storage.googleapis.com/img-gorillaisms/thraxatar.glb',
+//     // called when the resource is loaded
+//     function ( gltf ) {
+//         scene.add( gltf.scene );
+//         gltf.animations; // Array<THREE.AnimationClip>
+//         gltf.scene; // THREE.Group
+//         gltf.scenes; // Array<THREE.Group>
+//         gltf.cameras; // Array<THREE.Camera>
+//         gltf.asset; // Object
         
-    },
-    // called while loading is progressing
-    function ( xhr ) {
+//     },
+//     // called while loading is progressing
+//     function ( xhr ) {
 
-        console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+//         console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
 
-    },
-    // called when loading has errors
-    function ( error ) {
-        console.log(error);
-        console.log( 'An error happened' );
+//     },
+//     // called when loading has errors
+//     function ( error ) {
+//         console.log(error);
+//         console.log( 'An error happened' );
 
-    }
-);
+//     }
+// );
 
 
 
@@ -101,9 +187,6 @@ const camera = new THREE.PerspectiveCamera(
     0.1,
     1000
 )
-camera.position.z = -2.0
-camera.position.x = 0
-camera.position.y = 0
 
 
 const renderer = new THREE.WebGLRenderer()
@@ -184,9 +267,16 @@ function animate() {
     render()
 }
 
+
+
+camera.position.set(-2, 21, -17);
+
 function render() {
+    stats.update();
+
     // cameraFollowsPath(possiblePaths[selectedPath], clock.getElapsedTime())
-    
+    videoTexture.needsUpdate = true;
+    video.play();
     renderer.render(scene, camera)
 }
 
